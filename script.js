@@ -1,6 +1,6 @@
+// COUNTER COMPONENT
 const textareaEl = document.querySelector('.form__textarea');
 const counterEl = document.querySelector('.counter');
-
 
 const textareaInputListener = () => { 
     const maxChars = textareaEl.maxLength;
@@ -12,10 +12,12 @@ const textareaInputListener = () => {
 
 textareaEl.addEventListener('input', textareaInputListener);
 
+// SUBMIT COMPONENT
+const formEl = document.querySelector('.form');
 
+const submitHandler = (event) => {
+    // prevent default browser action
+    event.preventDefault();
+};
 
-
-
-
-
-
+formEl.addEventListener('submit', submitHandler)
