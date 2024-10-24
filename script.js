@@ -2,6 +2,7 @@
 const textareaEl = document.querySelector('.form__textarea');
 const counterEl = document.querySelector('.counter');
 const formEl = document.querySelector('.form');
+const feedbackListEl = document.querySelector('.feedbacks');
 
 // COUNTER COMPONENT
 
@@ -63,6 +64,8 @@ const submitHandler = event => {
         </div>
         <p class="feedback__date">${daysAgo}</p>
     </li>`;
+
+    feedbackListEl.insertAdjacentHTML("beforeend", feedbackItemHTML);
 };
 
 formEl.addEventListener('submit', submitHandler);
