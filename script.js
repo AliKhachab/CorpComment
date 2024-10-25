@@ -1,80 +1,108 @@
-// GLOBAL
-const textareaEl = document.querySelector('.form__textarea');
-const counterEl = document.querySelector('.counter');
-const formEl = document.querySelector('.form');
-const feedbackListEl = document.querySelector('.feedbacks');
-const submitButtonEl = document.querySelector('.submit-btn');
+// GLOBAL SELECTORS
+
+const textareaEl = document.querySelector(".form__textarea");
+const counterEl = document.querySelector(".counter");
+const formEl = document.querySelector(".form");
+const feedbackListEl = document.querySelector(".feedbacks");
+const submitButtonEl = document.querySelector(".submit-btn");
+const spinnerEl = document.querySelector(".spinner");
+
+//GLOBAL VARIABLES
+
 const MAX_CHARS = textareaEl.maxLength;
 
+//GLOBAL FUNCTIONS
+
+const renderFeedbackItem = feedbackItem => {
+    const feedbackItemHTML = `<li class="feedback">
+        <button class="upvote">
+            <i class="fa-solid fa-caret-up upcvote__icon"></i>
+            <span class="upvote__count">${feedbackItem.upvoteCount}</span>
+        </button>
+        <section class="feedback__badge">
+            <p class="feedback__letter">${feedbackItem.badgeLetter}</p>
+        </section>
+        <div class="feedback__content">
+            <p class="feedback__company">${feedbackItem.company}</p>
+            <p class="feedback__text">${feedbackItem.text}</p>
+        </div>
+        <p class="feedback__date">${
+          feedbackItem.daysAgo === 0 ? "new" : `${feedbackItem.daysAgo + "d"}`
+        }</p>
+    </li>`;
+    
+    feedbackListEl.insertAdjacentHTML("beforeend", feedbackItemHTML);
+
+}
 // COUNTER COMPONENT
 
-const textareaInputListener = () => { 
-    const currChars = textareaEl.value.length;
-    const charsLeft = MAX_CHARS - currChars;    
-    // maxLength does not account for edge case of copy pasting into the textarea, need to fix.
-    counterEl.textContent = charsLeft.toString();
+const textareaInputListener = () => {
+  const currChars = textareaEl.value.length;
+  const charsLeft = MAX_CHARS - currChars;
+  // maxLength does not account for edge case of copy pasting into the textarea, need to fix.
+  counterEl.textContent = charsLeft.toString();
 };
 
-textareaEl.addEventListener('input', textareaInputListener);
+textareaEl.addEventListener("input", textareaInputListener);
 
 // FORM COMPONENT
 const showVisualIndicator = (validity) => {
-    const className = validity === 'valid' ? 'form--valid' : 'form--invalid';
-    formEl.classList.add(className);
-    setTimeout(() => {
-        formEl.classList.remove(className);
-    }, 2000);
-
+  const className = validity === "valid" ? "form--valid" : "form--invalid";
+  formEl.classList.add(className);
+  setTimeout(() => {
+    formEl.classList.remove(className);
+  }, 2000);
 };
 
-const submitHandler = event => {
-    // prevent default browser action of refreshing page on submit press
-    event.preventDefault();
+const submitHandler = (event) => {
+  // prevent default browser action of refreshing page on submit press
+  event.preventDefault();
 
-    // get text from text area and validate it
-    const text = textareaEl.value;
-    if (text.includes('#') && text.length >= 5) {
-        showVisualIndicator('valid');
-    } else {
-        showVisualIndicator('invalid');
-        textareaEl.focus();
-        return;
-    }
+  // get text from text area and validate it
+  const text = textareaEl.value;
+  if (text.includes("#") && text.length >= 5) {
+    showVisualIndicator("valid");
+  } else {
+    showVisualIndicator("invalid");
+    textareaEl.focus();
+    return;
+  }
 
-    // get the first company name hashtag in the text (if charAt index 0 of a word is #, that is now the hashtag)
-    const hashtag = text.split(' ').find(element => element.charAt(0) === '#');
-    const companyName = hashtag.substring(1);
-    const badgeLetter = companyName.charAt(0).toUpperCase();
-    const upvoteCount = 0;
-    const daysAgo = 0;
+  // get the first company name hashtag in the text (if charAt index 0 of a word is #, that is now the hashtag)
+  const hashtag = text.split(" ").find((element) => element.charAt(0) === "#");
+  const company = hashtag.substring(1);
+  const badgeLetter = company.charAt(0).toUpperCase();
+  const upvoteCount = 0;
+  const daysAgo = 0;
 
-    // new feedback item HTML
+  // new feedback item HTML
+  const feedbackItemObject = {
+    upvoteCount: upvoteCount,
+    company: company,
+    daysAgo: daysAgo,
+    badgeLetter: badgeLetter,
+    text: text
+  }
+  renderFeedbackItem(feedbackItemObject);
 
-    const feedbackItemHTML = 
-    `<li class="feedback">
-        <button class="upvote">
-            <i class="fa-solid fa-caret-up upcvote__icon"></i>
-            <span class="upvote__count">${upvoteCount}</span>
-        </button>
-        <section class="feedback__badge">
-            <p class="feedback__letter">${badgeLetter}</p>
-        </section>
-        <div class="feedback__content">
-            <p class="feedback__company">${companyName}</p>
-            <p class="feedback__text">${text}</p>
-        </div>
-        <p class="feedback__date">${daysAgo === 0 ? 'new' : `${daysAgo + "d"}`}</p>
-    </li>`;
+  textareaEl.value = "";
+  submitButtonEl.blur();
 
-    feedbackListEl.insertAdjacentHTML("beforeend", feedbackItemHTML);
-
-    textareaEl.value = '';
-    submitButtonEl.blur();
-
-    counterEl.textContent = textareaEl.maxLength.toString();
-    
+  counterEl.textContent = textareaEl.maxLength.toString();
 };
 
-formEl.addEventListener('submit', submitHandler);
+formEl.addEventListener("submit", submitHandler);
 
+// FEEDBACK LIST COMPONENT
 
+fetch("https://bytegrad.com/course-assets/js/1/api/feedbacks")
+  .then((res) => res.json())
+  .then((data) => {
+    spinnerEl.remove();
+
+    data.feedbacks.forEach((feedbackItem) => renderFeedbackItem(feedbackItem));
+  })
+  .catch((error) => {
+    spinnerEl.remove();
+    feedbackListEl.textContent = `Error fetching feedbacks: ${error.message}`;
+  });
