@@ -4,20 +4,28 @@ const counterEl = document.querySelector('.counter');
 const formEl = document.querySelector('.form');
 const feedbackListEl = document.querySelector('.feedbacks');
 const submitButtonEl = document.querySelector('.submit-btn');
+const MAX_CHARS = textareaEl.maxLength;
 
 // COUNTER COMPONENT
 
 const textareaInputListener = () => { 
-    const maxChars = textareaEl.maxLength;
     const currChars = textareaEl.value.length;
-    const charsLeft = maxChars - currChars;    
+    const charsLeft = MAX_CHARS - currChars;    
     // maxLength does not account for edge case of copy pasting into the textarea, need to fix.
     counterEl.textContent = charsLeft.toString();
 };
 
 textareaEl.addEventListener('input', textareaInputListener);
 
-// SUBMIT COMPONENT
+// FORM COMPONENT
+const showVisualIndicator = (validity) => {
+    const className = validity === 'valid' ? 'form--valid' : 'form--invalid';
+    formEl.classList.add(className);
+    setTimeout(() => {
+        formEl.classList.remove(className);
+    }, 2000);
+
+};
 
 const submitHandler = event => {
     // prevent default browser action of refreshing page on submit press
@@ -26,18 +34,10 @@ const submitHandler = event => {
     // get text from text area and validate it
     const text = textareaEl.value;
     if (text.includes('#') && text.length >= 5) {
-        formEl.classList.add('form--valid');
-        setTimeout(() => {
-            formEl.classList.remove('form--valid');
-        }, 2000);
+        showVisualIndicator('valid');
     } else {
-        formEl.classList.add('form--invalid');
-        setTimeout(() => {
-            formEl.classList.remove('form--invalid');
-        }, 2000);
-        
+        showVisualIndicator('invalid');
         textareaEl.focus();
-
         return;
     }
 
