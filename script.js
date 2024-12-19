@@ -9,7 +9,8 @@ const spinnerEl = document.querySelector(".spinner");
 
 //GLOBAL VARIABLES
 
-const MAX_CHARS = textareaEl.maxLength;
+const BASE_API_URL = "https://bytegrad.com/course-assets/js/1/api";
+const MAX_CHARS = textareaEl.maxLength.toString();
 
 //GLOBAL FUNCTIONS
 
@@ -85,17 +86,33 @@ const submitHandler = (event) => {
   }
   renderFeedbackItem(feedbackItemObject);
 
+  // send feedback to server
+  fetch(`${BASE_API_URL}/feedbacks`, {
+    method: "POST",
+    body: JSON.stringify(feedbackItemObject),
+    headers: {
+      Accept: 'application/json',
+      "Content-Type": "application/json",
+    }
+  }).then(res => {
+    if (!res.ok) {
+      console.log("Something went wrong");
+      return;
+    }
+      console.log("Feedback sent successfully");
+  }).catch(error => console.log(error));
+
   textareaEl.value = "";
   submitButtonEl.blur();
 
-  counterEl.textContent = textareaEl.maxLength.toString();
+  counterEl.textContent = MAX_CHARS;
 };
 
 formEl.addEventListener("submit", submitHandler);
 
 // FEEDBACK LIST COMPONENT
 
-fetch("https://bytegrad.com/course-assets/js/1/api/feedbacks")
+fetch(`${BASE_API_URL}/feedbacks`)
   .then((res) => res.json())
   .then((data) => {
     spinnerEl.remove();
