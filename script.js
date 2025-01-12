@@ -111,6 +111,32 @@ const submitHandler = (event) => {
 formEl.addEventListener("submit", submitHandler);
 
 // FEEDBACK LIST COMPONENT
+const clickHandler = (event) => {
+   // get clicked HTML element
+   const clickedEl = event.target;
+
+    // determine if user intended to upvote or expand list item
+    const upvoteIntention = clickedEl.className.includes("upvote");
+
+    if (upvoteIntention) {
+      const upvoteBtnEl = clickedEl.closest(".upvote");
+
+      // disable upvote button
+      upvoteBtnEl.disabled = true;
+
+      const upvoteCountEl = upvoteBtnEl.querySelector(".upvote__count");
+
+      // increment upvote count
+
+      const upvoteCount = +upvoteCountEl.textContent;
+      upvoteCountEl.textContent = (upvoteCount + 1).toString();
+
+    } else {
+      clickedEl.closest(".feedback").classList.toggle('feedback--expand');
+    }
+};
+
+feedbackListEl.addEventListener("click", clickHandler);
 
 fetch(`${BASE_API_URL}/feedbacks`)
   .then((res) => res.json())
@@ -123,3 +149,4 @@ fetch(`${BASE_API_URL}/feedbacks`)
     spinnerEl.remove();
     feedbackListEl.textContent = `Error fetching feedbacks: ${error.message}`;
   });
+
