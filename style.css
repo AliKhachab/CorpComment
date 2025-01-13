@@ -32,6 +32,10 @@ button {
 }
 
 /* UTILITIES */
+.hidden {
+    display: none !important;
+}
+
 .u-bold {
     font-weight: 600;
 }

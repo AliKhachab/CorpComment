@@ -6,6 +6,7 @@ const formEl = document.querySelector(".form");
 const feedbackListEl = document.querySelector(".feedbacks");
 const submitButtonEl = document.querySelector(".submit-btn");
 const spinnerEl = document.querySelector(".spinner");
+const hashtagListEl = document.querySelector(".hashtags");
 
 //GLOBAL VARIABLES
 
@@ -111,7 +112,7 @@ const submitHandler = (event) => {
 formEl.addEventListener("submit", submitHandler);
 
 // FEEDBACK LIST COMPONENT
-const clickHandler = (event) => {
+const clickHandlerFeedback = (event) => {
    // get clicked HTML element
    const clickedEl = event.target;
 
@@ -136,7 +137,7 @@ const clickHandler = (event) => {
     }
 };
 
-feedbackListEl.addEventListener("click", clickHandler);
+feedbackListEl.addEventListener("click", clickHandlerFeedback);
 
 fetch(`${BASE_API_URL}/feedbacks`)
   .then((res) => res.json())
@@ -150,3 +151,42 @@ fetch(`${BASE_API_URL}/feedbacks`)
     feedbackListEl.textContent = `Error fetching feedbacks: ${error.message}`;
   });
 
+
+// HASHTAG LIST COMPONENT
+const clickHandlerHashtag = (event) => {
+  const clickedEl = event.target;
+
+  if (clickedEl.className === 'hashtags') { // if clicking off to reset the screen, show all feedback items in case any were hidden
+    console.log("clicked elsewhere");
+    feedbackListEl.childNodes.forEach(element => {
+      if (element.nodeType === 3) return; // skip text nodes
+
+      element.classList.remove('hidden');
+      console.log(element);
+    });
+
+    return;
+  };
+
+  // extract company name
+  const companyName = clickedEl.textContent.substring(1).toLowerCase().trim();
+  
+  // iterate through feedback items and hide those that do not match the company name
+  feedbackListEl.childNodes.forEach(element => {
+    if (element.nodeType === 3) return; // skip text nodes
+
+    // extract company name from feedback item
+    const feedbackCompanyName = element.querySelector('.feedback__company').textContent.toLowerCase().trim();
+
+    // remove feedback item if company name does not match
+    if (feedbackCompanyName !== companyName) {
+      element.classList.add('hidden');
+      console.log(element);
+    } else {
+      element.classList.remove('hidden');    
+      console.log(element);
+    }
+  });
+}
+
+hashtagListEl.addEventListener('click', clickHandlerHashtag);
