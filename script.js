@@ -95,7 +95,7 @@ const renderFeedbackItem = (feedbackItem) => {
       method: "POST",
       body: JSON.stringify(feedbackItemObject),
       headers: {
-        Accept: "application/json"
+        Accept: "application/json",
         "Content-Type": "application/json",
       },
     })
